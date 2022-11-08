@@ -25,16 +25,17 @@ class Layer:
         self.input_units = input_units
         self.biases = np.zeros(n_units)
         self.weights = np.random.random((input_units, n_units))
-        #self.input = np.array([])
-        self.input = np.array([0.5, 3, 7])
+        self.input = np.array([])
         self.preactivation = np.empty(n_units)
-        #self.activation = np.empty(n_units)
-        self.activation = np.array([1, 2, 3])
+        self.activation = np.empty(n_units)
+        #self.activation = np.array([1, 2, 3])
 
-    def forward_step(self, prev_activation):
-        self.preactivation = (prev_activation * self.weights) + self.biases
-        print(np.maximum(0, self.preactivation))
-        return np.maximum(0, self.preactivation)
+    def forward_step(self, previous):
+        self.input = previous
+        self.preactivation = (self.input * self.weights) + self.biases
+        #print(np.maximum(0, self.preactivation))
+        self.activation = np.maximum(0, self.preactivation)
+        return self.activation
 
     def backward_step(self, targets):
         diff = self.activation - targets
@@ -57,13 +58,37 @@ class Layer:
         #print(self.biases)
         return
 
+class MLP:
 
-layer1 = Layer(3, 3)
+    def __init__(self, layers):
+        self.layers = np.array(layers)
+        self.output = []
+
+    def feed_forward(self, input):
+        self.layers[0].forward_step(input)
+        print(self.layers[0].activation)
+        for i in range(1, len(self.layers)-1):
+            self.layers[i+1].forward_step(self.layers[i].activation)
+            print(self.layers[i+1].activation)
+        return self.layers[-1].activation
+
+    def backpropagation(self, loss):
+        
+        return
+
+
+
+layer1 = Layer(3, 1)
+layer2 = Layer(3, 3)
+layer3 = Layer(3, 3)
+layer4 = Layer(1, 3)
+
+mlp = MLP([layer1, layer2, layer3, layer4])
+mlp.feed_forward(4)
 
 #layer1.forward_step(np.array([2, 3, 4]))
 
-targets = [1, 4, 5]
+#targets = [1, 4, 5]
 
-layer1.backward_step(targets)
-
+#layer1.backward_step(targets)
 
