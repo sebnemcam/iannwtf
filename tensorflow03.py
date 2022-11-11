@@ -1,9 +1,11 @@
 import tensorflow_datasets as tfds
 import tensorflow as tf
 
+# Loading the MNIST dataset
+
 (train_ds, test_ds), ds_info = tfds.load('mnist', split=['train', 'test'], as_supervised=True, with_info=True)
 
-#prepare our data - data pipeline
+# Prepare our data - data pipeline
 
 def prepare_mnist_data(mnist):
   #flatten the images into vectors
@@ -25,3 +27,74 @@ def prepare_mnist_data(mnist):
 
 train_dataset = train_ds.apply(prepare_mnist_data)
 test_dataset = test_ds.apply(prepare_mnist_data)
+
+# Building a deep neural network with TensorFlow
+
+from tensorflow.keras.layers import Dense
+
+class MyModel(tf.keras.Model):
+    
+    def __init__(self):
+        super(MyModel, self).__init__()
+        self.dense1 = tf.keras.layers.Dense(256, activation=tf.nn.relu)
+        self.dense2 = tf.keras.layers.Dense(256, activation=tf.nn.relu)
+        self.out = tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+
+    @tf.function
+    def call(self, inputs):
+        x = self.dense1(inputs)
+        x = self.dense2(x)
+        x = self.out(x)
+        return x
+
+# Trainng the network
+
+tf.keras.backend.clear_session()
+
+#For showcasing we only use a subset of the training and test data (generally use all of the available data!)
+train_dataset = train_dataset.take(1000)
+test_dataset = test_dataset.take(100)
+
+### Hyperparameters
+num_epochs = 10
+learning_rate = 0.1
+
+# Initialize the model.
+model = MyModel()
+# Initialize the loss: categorical cross entropy. Check out 'tf.keras.losses'.
+cross_entropy_loss = tf.keras.losses.CategoricalCrossentropy()
+# Initialize the optimizer: SGD with default parameters. Check out 'tf.keras.optimizers'
+optimizer = tf.keras.optimizers.SGD(learning_rate)
+
+# Initialize lists for later visualization.
+train_losses = []
+test_losses = []
+test_accuracies = []
+
+#testing once before we begin
+test_loss, test_accuracy = test(model, test_dataset, cross_entropy_loss)
+test_losses.append(test_loss)
+test_accuracies.append(test_accuracy)
+
+#check how model performs on train data once before we begin
+train_loss, _ = test(model, train_dataset, cross_entropy_loss)
+train_losses.append(train_loss)
+
+# We train for num_epochs epochs.
+for epoch in range(num_epochs):
+    print(f'Epoch: {str(epoch)} starting with accuracy {test_accuracies[-1]}')
+
+    #training (and checking in with training)
+    epoch_loss_agg = []
+    for input,target in train_dataset:
+        train_loss = train_step(model, input, target, cross_entropy_loss, optimizer)
+        epoch_loss_agg.append(train_loss)
+    
+    #track training loss
+    train_losses.append(tf.reduce_mean(epoch_loss_agg))
+
+    #testing, so we can track accuracy and test loss
+    test_loss, test_accuracy = test(model, test_dataset, cross_entropy_loss)
+    test_losses.append(test_loss)
+    test_accuracies.append(test_accuracy)
+    
