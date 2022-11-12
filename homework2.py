@@ -1,7 +1,7 @@
-import numpy as np
-from numpy.random import default_rng
 import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
+from numpy.random import default_rng
 
 # Task 01 - Building our data set
 
@@ -11,14 +11,20 @@ print(x)
 #our targets t
 t = x**2
 
-
-
 # Task 02 - Perceptrons
-
 
 class Layer:
     #constructor with all necessary parameters
     def __init__(self, n_units, input_units):
+        '''Instantiates a Layer object.
+
+        Args:
+            n_units::int
+                The number of units in the layer
+            input_units::int
+                The number of units in the previous layer, which are the input units to this layer
+        '''
+
         self.n_units = n_units
         self.input_units = input_units
         self.biases = np.zeros(n_units)
@@ -29,6 +35,17 @@ class Layer:
 
     # method for forward step
     def forward_step(self, previous):
+        '''Passes a given input through a single layer.
+
+        Args:
+            previous::list
+                The activations of the previous layer
+
+        Returns:
+            self.activation::list
+                The activations of this layer
+        '''
+
         self.input = previous
         self.preactivation = (self.input * self.weights) + self.biases
         # ReLu: activation is equal to the preactuvation if it is above 0, else the actuvation is 0
@@ -36,6 +53,19 @@ class Layer:
         return self.activation
 
     def backward_step(self, dLda):
+        '''Updates a layer's weights and biases according to the activation gradient.
+
+        Args:
+            dlda::list
+                The gradient of the loss function with respect to the layer's activations
+
+        Returns:
+            dLda * (self.preactivation > 0) * tf.transpose(self.weights)::list
+                The gradient of the loss function with respect to the previous layer's activations 
+        '''
+
+        #Something probably goes wrong here. There seems to be an error with different shapes that python can't work with,
+        #however we failed to resolve the mistake.
 
         # dLda = derivative of MSE
         dLda = self.input - t
@@ -50,17 +80,36 @@ class Layer:
         # updating the layer's parameters
         self.weights = self.weights - (0.03 * gradients_weights)
         self.biases = self.biases - (0.03 * gradients_biases)
-        return gradients_inputs = dLda * (self.preactivation > 0) * tf.transpose(self.weights)
+
+        return dLda * (self.preactivation > 0) * tf.transpose(self.weights)
 
 # Task 03: Multi-layer Perceptron
 
 class MLP:
     # constructor
     def __init__(self, layers):
+        '''Instantiates an MLP object.
+
+        Args:
+            layers::list
+                The multi-layer-perceptron's layers.
+        '''
+
         self.layers = np.array(layers)
         self.output = []
 
     def forward_step(self, input):
+        '''Passes an input through the entire multi-layer-perceptron.
+
+        Args:
+            input::float
+                The input given into the system
+        
+        Returns:
+            self.layers[-1].activation::float
+                The last layer's activation, which is also the system's output
+        '''
+
         for i in range(0, len(self.layers) - 1):
             if i == 0:
                 # first layer feeds forward the given input
@@ -73,6 +122,12 @@ class MLP:
         return self.layers[-1].activation
 
     def backpropagation(self, dLda):
+        '''Updates the system's weights and biases.
+
+        Args:
+            dLda::list
+                The gradient of the loss function with respect to the system's output.
+        '''
         for layer in np.flip(self.layers):
             # updating dL/da
             dLda = layer.backward_step(dLda)
@@ -97,7 +152,7 @@ for i in range(1000):
 
 # Task 05: Visualization
 
-# if our code was working as intended, the graph visualizing the mean loss per epoch should somewhat look like this
+# if our code was working as intended, the graph visualizing the mean loss per epoch could somewhat look like this
 x = (np.array(range(101)))*10
 epoch_loss_tracker: float = 1/(x+1)
 y = epoch_loss_tracker
