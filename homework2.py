@@ -1,3 +1,6 @@
+#DISCLAIMER: We did not manage to solve all tasks this week. We solved task 4 and 5 without real data, because we could not get our MLP to work.
+#We speculat about the error source at the appropriate place, namely at the backward_step method of the Layer class.
+
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
