@@ -1,5 +1,6 @@
 import tensorflow_datasets as tfds
 import tensorflow as tf
+from mathplotlib import pyplot as plt
 
 # Loading the MNIST dataset
 
@@ -48,6 +49,34 @@ class MyModel(tf.keras.Model):
         return x
 
 # Trainng the network
+
+def train_step(model, input, target, loss_function, optimizer):
+  # loss_object and optimizer_object are instances of respective tensorflow classes
+  with tf.GradientTape() as tape:
+    prediction = model(input)
+    loss = loss_function(target, prediction)
+  gradients = tape.gradient(loss, model.trainable_variables)
+  optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+  return loss
+
+def test(model, test_data, loss_function):
+  # test over complete test data
+
+  test_accuracy_aggregator = []
+  test_loss_aggregator = []
+
+  for (input, target) in test_data:
+    prediction = model(input)
+    sample_test_loss = loss_function(target, prediction)
+    sample_test_accuracy =  np.argmax(target, axis=1) == np.argmax(prediction, axis=1)
+    sample_test_accuracy = np.mean(sample_test_accuracy)
+    test_loss_aggregator.append(sample_test_loss.numpy())
+    test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
+
+  test_loss = tf.reduce_mean(test_loss_aggregator)
+  test_accuracy = tf.reduce_mean(test_accuracy_aggregator)
+
+  return test_loss, test_accuracy
 
 tf.keras.backend.clear_session()
 
@@ -119,12 +148,12 @@ test losses
 test_accuracies : numpy . ndarray
 test accuracies
 """
-plt . figure ()
-line1 , = plt . plot ( train_losses , "b-")
-line2 , = plt . plot ( test_losses , "r-")
-line3 , = plt . plot ( train_accuracies , "b:")
-line4 , = plt . plot ( test_accuracies , "r:")
-plt . xlabel (" Training steps ")
-plt . ylabel (" Loss / Accuracy ")
-plt . legend (( line1 , line2 , line3 , line4 ) , (" training loss ", " testloss ", " train accuracy ", " test accuracy "))
-plt . show ()
+plt.figure ()
+line1 , = plt.plot ( train_losses , "b-")
+line2 , = plt.plot ( test_losses , "r-")
+line3 , = plt.plot ( train_accuracies , "b:")
+line4 , = plt.plot ( test_accuracies , "r:")
+plt.xlabel (" Training steps ")
+plt.ylabel (" Loss / Accuracy ")
+plt.legend (( line1 , line2 , line3 , line4 ) , (" training loss ", " testloss ", " train accuracy ", " test accuracy "))
+plt.show ()
