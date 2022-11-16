@@ -1,6 +1,7 @@
 import tensorflow_datasets as tfds
 import tensorflow as tf
-from mathplotlib import pyplot as plt
+from matplotlib import pyplot as plt
+import numpy as np
 
 # Loading the MNIST dataset
 
@@ -97,6 +98,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate)
 
 # Initialize lists for later visualization.
 train_losses = []
+train_accuracies = []
 test_losses = []
 test_accuracies = []
 
@@ -106,7 +108,7 @@ test_losses.append(test_loss)
 test_accuracies.append(test_accuracy)
 
 #check how model performs on train data once before we begin
-train_loss, _ = test(model, train_dataset, cross_entropy_loss)
+train_loss, train_accuracy = test(model, train_dataset, cross_entropy_loss)
 train_losses.append(train_loss)
 
 # We train for num_epochs epochs.
