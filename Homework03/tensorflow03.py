@@ -159,3 +159,4 @@ plt.xlabel (" Training steps ")
 plt.ylabel (" Loss / Accuracy ")
 plt.legend (( line1 , line2 , line3 , line4 ) , (" training loss ", " testloss ", " train accuracy ", " test accuracy "))
 plt.show ()
+
