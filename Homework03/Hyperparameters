@@ -1,1 +1,67 @@
+In this task, we tried to incrementally build the optimally performing model. Efficiency was not a goal during this.
+
+Initital settings:
+- learning rate = 0.1
+- epochs = 10
+- optimizer = SGD
+- loss function = categorical cross entropy
+- batch size = 32
+- layers = 2
+- layers = 256
+
+Deviation 1:
+- learning rate = 0.5
+- epochs = 10
+- optimizer = SGD
+- loss function = categorical cross entropy
+- batch size = 32
+- layers = 2
+- layer size = 256
+- Comment: To test the effect of an increased learning rate, we changed it massively form 0.1 to 0.5. This changed the results a lot.
+           Both the training and test loss were extremely high and the test accuracy was next to zero.
+           As expected, the learning rate was way to high to reach good results, rendering the model useless.
+           With this high of a learning rate, the weights fluctuate way to much to converge onto an optimum.
+
+Deviation 2:
+- learning rate = 0.1
+- epochs = 10
+- optimizer = SGD
+- loss function = categorical cross entropy
+- batch size = 64
+- layers = 2
+- layer size = 256
+- Comment: In this run, we reset the learning rate to 0.1 and increased the batch size from 32 to 64.
+           In theory, this should decrease the training and test loss. We observed a much improved test loss, although the training loss stayed more or less the same.
+           The test accuracy increased only marginally from 96% to 96,5%. Although this is not a big jump in numbers, it still is a good improvement for an already accurate model.
+           The change in batch size worked as expected, because a larger batch represents a gradient calculation over a larger amount of examples.
+
+Deviation 3:
+- learning rate = 0.03
+- epochs = 10
+- optimizer = Adam
+- loss function = categorical cross entropy
+- batch size = 32
+- layers = 2
+- layer size = 256
+- Comment: Now, we introduced Adam as a new optimizer into the model, replacing SGD. We also decreased the learning rate to a more sensible amount of 0.03.
+           Adam was developed through a chain of optimizations to SGD, so we expect it to perform better.
+           This is exactly what our results show. We observed a much lower test loss, which also fluctuated way less between epochs.
+           The latter observation directly corresponds to the implementation of momentum into Adam, which by definition leaves less fluctuations.
+           
+Deviation 4:
+- learning rate = 0.03
+- epochs = 10
+- optimizer = Adam
+- loss function = categorical cross entropy
+- batch size = 64
+- layers = 3
+- layer size = 256
+- Comment: In our final configuration, we tried to combine multiple changes into a single, powerful model.
+           To achieve this, we combined Adam with a batch size of 64 and a third layer with 256 units. The learning rate was also set to 0.03.
+           In comparison to the intitial settings, we observed much better results. To really get an opinion on the performance of this model,
+           we compared it to our previous version described in deviation 3. Here, we surprisingly did not find any significant improvements.
+           One possibility is that the model was already (almost) fully optimized in deviation 3 and the additional batch size and layer did not have any impact anymore.
+           
+
+
 
